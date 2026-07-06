@@ -23,6 +23,7 @@ enum UserRole {
 model User {
   id                    String                 @id @default(auto()) @map("_id") @db.ObjectId
   name                  String?
+  username              String?                @unique        
   email                 String?                @unique
   emailVerified         DateTime?
   image                 String?
@@ -34,6 +35,10 @@ model User {
   phone                 String?                @default("")
   address               String?                @default("")
   orders                Order[]
+  createdAt             DateTime?               @default(now())
+  updatedAt             DateTime?               @updatedAt
+
+  @@map("users")
 }
 
 // AUTHENTICATION
@@ -112,6 +117,7 @@ model Product {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("products")
 }
 
 enum Category {
@@ -181,6 +187,7 @@ model Order {
   updatedAt     DateTime     @updatedAt
 
   @@index([userId])
+  @@map("orders")
 }
 
 type ShippingInfo {
@@ -192,7 +199,7 @@ type ShippingInfo {
 }
 
 type OrderItem {
-  productId String  @db.ObjectId
+  productId String?  @db.ObjectId
   name      String
   quantity  Int
   image     String
