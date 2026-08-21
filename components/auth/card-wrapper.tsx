@@ -28,8 +28,11 @@ export const CardWrapper = ({
 } : CardWrapperProps) => {
     return (
         <Card 
-            className=
-                "w-full h-full min-h-screen rounded-none border-none shadow-none flex flex-col justify-center bg-white px-6 tablet:pt-10 tablet:w-[420px] tablet:min-h-0 tablet:h-auto tablet:rounded-xl tablet:shadow-md tablet:border tablet:justify-center">
+            className="
+                w-full h-full min-h-screen rounded-none border-none shadow-none flex flex-col justify-center bg-white px-6 
+                md:pt-10 md:w-[420px] md:min-h-0 md:h-auto md:rounded-xl md:shadow-md md:border md:justify-center
+                "
+        >
             <CardHeader>
                 <Header label={headerLabel}/>
             </CardHeader>

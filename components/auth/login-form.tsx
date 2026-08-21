@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition, useState } from "react"; // 
 import { useSearchParams } from "next/navigation";
-import { login } from "@/actions/login"
+import { login } from "@/actions/auth/login"
 import { LoginSchema } from "@/schemas";
 import { Input } from "../ui/input";
 import { 

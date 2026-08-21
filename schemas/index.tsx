@@ -79,7 +79,7 @@ export const productSchema = z.object({
         introText: z.array(z.object({ title: z.string(), content: z.string() })),
         highlightFeatures: z.array(z.object({ title: z.string(), content: z.string() })),
         essentialFeatures: z.array(z.object({ title: z.string(), content: z.string() })),
-        middleBannerImage: z.string().optional()
+        middleBannerImage: z.array(z.string()),
     }),
 
     techSpecs: z.record(z.string(), z.unknown()).optional()

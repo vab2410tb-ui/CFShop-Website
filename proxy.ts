@@ -4,18 +4,24 @@ import {
   apiAuthPrefix,
   authRoutes, 
   publicRoutes,
-  apiAdminPrefix
+  publicRoutePrefixes,
+  AdminPrefix,
 } from "@/routes"
 
 const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
+
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
+  const pathname = nextUrl.pathname;
+
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
+  const isPublicRoute =
+    publicRoutes.includes(pathname) ||
+    publicRoutePrefixes.some((route) => pathname.startsWith(route));
   const isAuthRoute = authRoutes.includes(nextUrl.pathname)
-  const isAdminRoute = nextUrl.pathname.startsWith(apiAdminPrefix);
+  const isAdminRoute = nextUrl.pathname.startsWith(AdminPrefix);
   const userRole = req.auth?.user?.role
   
   if(isApiAuthRoute) {
@@ -36,21 +42,16 @@ export default auth((req) => {
 
   if (isAdminRoute && userRole !== "ADMIN") {
             return Response.redirect(new URL("/settings", nextUrl)); 
-        
-    }
-
-  if(isLoggedIn && nextUrl.pathname === "/") {
-    const redirectPath = userRole === "ADMIN" ? "/admin/products" : "/settings";
-    return Response.redirect(new URL(redirectPath, nextUrl));
   }
+
   if (nextUrl.pathname.startsWith('/settings') && userRole === "ADMIN") {
-    return Response.redirect(new URL("/admin/products", nextUrl));
+    return Response.redirect(new URL("/admin/dashboard", nextUrl));
   }
     
   return null;
 })
 
 export const config = {
-  matcher: ['/((?!_next|[^?]*\\.(?:html|css|js(?!on)|jpe?g|webp|png|gif|svg|ico|woff2?|docx?|xlsx?|zip)|api|trpc).*)',
-    '/(api|trpc)(.*)',],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|images).*)'],
 }
+;

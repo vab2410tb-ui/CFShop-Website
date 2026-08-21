@@ -6,10 +6,19 @@
 
 export const publicRoutes = [
     "/",
+    "/products/",
+    "/collections",
+    "/collections/all",
+    "/warranty",
+    "/auth/session",
     "/auth/new-verification",
-    "/abc"
+    "/videos/video.mp4",
 ]
 
+export const publicRoutePrefixes = [
+  "/collections/",
+  "/products/",
+];
 
 /**
  * An array of routes that are used for authentication
@@ -32,7 +41,7 @@ export const authRoutes = [
  */
 export const apiAuthPrefix = "/api/auth";
 
-export const apiAdminPrefix = "/admin";
+export const AdminPrefix = "/admin";
 
 /**
  * The default redirect path after logging in 

@@ -3,10 +3,10 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition, useState } from "react"; // 1. Bổ sung useState ở đây
+import { useTransition, useState } from "react";
 import { NewPasswordSchema } from "@/schemas/index";
 import { Input } from "../ui/input";
-import { newPassword } from "@/actions/new-password"
+import { newPassword } from "@/actions/auth/new-password"
 import { 
     Form, 
     FormControl,

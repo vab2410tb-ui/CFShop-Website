@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition, useState } from "react"; // 1. Bổ sung useState ở đây
 import { ResetSchema } from "@/schemas/index";
 import { Input } from "../ui/input";
-import { reset } from "@/actions/reset"
+import { reset } from "@/actions/auth/reset"
 import { 
     Form, 
     FormControl,
