@@ -45,10 +45,15 @@ export const login = async (data: LoginValues) => {
         const verificationToken = await generateVerificationToken(
             existingUser.email
         )
-        await sendVerificaitonEmail(
+        const emailResult = await sendVerificaitonEmail(
             verificationToken.email,
             verificationToken.token,
         );
+
+        if (emailResult.error) {
+            return { error: "Could not send the confirmation email. Please try again later." };
+        }
+
         return { success: "Email not verified. New confirmation email sent!"}
     }
 
@@ -100,10 +105,15 @@ export const login = async (data: LoginValues) => {
         } else {
             const twoFactorToken = await generateTwoFactorToken(existingUser.email);
 
-            await sendTwoFactorTokenEmail(
-                twoFactorToken.email,
-                twoFactorToken.token,
-            );
+            try {
+                await sendTwoFactorTokenEmail(
+                    twoFactorToken.email,
+                    twoFactorToken.token,
+                );
+            } catch (error) {
+                console.error("SEND TWO-FACTOR EMAIL ERROR:", error);
+                return { error: "Could not send the verification code. Please try again later." };
+            }
             
             return { twoFactor: true };
         }

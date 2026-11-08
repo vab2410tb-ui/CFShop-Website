@@ -5,7 +5,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 interface CheckoutViewProps {
   items: CartItem[];
   openOrder: boolean;
-  setOpenOrder: React.Dispatch<React.SetStateAction<boolean>>; // Sửa type chuẩn
+  setOpenOrder: React.Dispatch<React.SetStateAction<boolean>>;
   totalItem: number;
   totalPrice: number;
 }

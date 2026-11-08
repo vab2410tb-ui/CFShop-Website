@@ -34,10 +34,15 @@ export const register = async (data: RegisterValues) => {
 
     const verificationToken = await generateVerificationToken(email);
 
-    await sendVerificaitonEmail(
+    const emailResult = await sendVerificaitonEmail(
         verificationToken.email,
         verificationToken.token,
     );
+
+    if (emailResult.error) {
+        return { error: "Account created, but the confirmation email could not be sent. Please try again later." };
+    }
+
     return { success: "Please check your email to confirm your account!", error: undefined}
 
 }

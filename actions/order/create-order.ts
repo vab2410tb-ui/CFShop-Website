@@ -1,7 +1,7 @@
 "use server";
 
-import { Resend } from "resend";
 import { getAppUrl } from "@/lib/config/app-url";
+import { sendTransactionalEmail } from "@/lib/services/mail";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/auth/auth";
 import { CreateOrderSchema } from "@/schemas/order.schema";
@@ -56,9 +56,6 @@ interface OrderEmailData {
   paymentMethod: string;
   totalPrice: number;
 }
-
-// Initialize Resend
-const resend = new Resend(process.env.RESENT_API_KEY);
 
 export const createOrder = async (data: CreateOrderActionInput) => {
   try {
@@ -212,13 +209,9 @@ export const createOrder = async (data: CreateOrderActionInput) => {
 
     // Send confirmation email after the transaction is committed.
     try {
-      await resend.emails.send({
-        from: "NAB Coffee <onboarding@resend.dev>",
-
-        to: [shippingInfo.email],
-
+      await sendTransactionalEmail({
+        to: shippingInfo.email,
         subject: `[${orderData.orderId}] Thank you for your order!`,
-
         html: generateEmailTemplate(
           {
             orderId: orderData.orderId,
