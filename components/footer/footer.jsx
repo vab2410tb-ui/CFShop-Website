@@ -102,14 +102,12 @@ const Footer = () => {
                     </div>
                     <div className="h-[55px] max-w-[460px] mt-[48px]">
                        <Image 
-                            src="/images/image-1.png"
+                            src="/images/payment-method/image-1.png"
                             width={70}
                             height={70}
                             alt="img"
                             className="object-contain w-full h-full"
                        />
-
-                        
                     </div>
                 </div>
             </footer>

@@ -39,6 +39,7 @@ const ProductList = async ({ sort, category }: Props) => {
                 
                 <AddToCartButton
                   showIconOnlyOnMobile={true}
+                  showDisabledBadge={true}
                   product={cartItemPayload}
                   className={cn(
                     "absolute bottom-[20px] right-[10px] z-10",

@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -18,12 +13,9 @@ enum UserRole {
   USER
 }
 
-// USER
-
 model User {
   id                    String                 @id @default(auto()) @map("_id") @db.ObjectId
   name                  String?
-  username              String?                @unique        
   email                 String?                @unique
   emailVerified         DateTime?
   image                 String?
@@ -32,16 +24,18 @@ model User {
   accounts              Account[]
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
+
   phone                 String?                @default("")
   address               String?                @default("")
+  province              String?                @default("") 
+  ward                  String?                @default("")
+
   orders                Order[]
-  createdAt             DateTime?               @default(now())
-  updatedAt             DateTime?               @updatedAt
+  createdAt             DateTime?              @default(now())
+  updatedAt             DateTime?              @updatedAt
 
   @@map("users")
 }
-
-// AUTHENTICATION
 
 model Account {
   id                String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -97,8 +91,6 @@ model TwoFactorConfirmation {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// PRODUCT
-
 model Product {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   sku             String      @unique
@@ -117,6 +109,7 @@ model Product {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@map("products")
 }
 
@@ -169,22 +162,20 @@ type TechSpecs {
   ApproximateWeight            String?
 }
 
-// ORDER 
-
 model Order {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  orderId String @unique
-
-  // Link with User table (Use UserRole original)
-  userId        String?      @db.ObjectId
-  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
-  shippingInfo  ShippingInfo
-  orderItems    OrderItem[]
-  paymentMethod String
-  totalPrice    Float
-  status        OrderStatus  @default(PENDING)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id                   String        @id @default(auto()) @map("_id") @db.ObjectId
+  orderId              String        @unique
+  userId               String?       @db.ObjectId
+  user                 User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  shippingInfo         ShippingInfo
+  orderItems           OrderItem[]
+  paymentMethod        PaymentMethod
+  paymentStatus        PaymentStatus @default(UNPAID)
+  paymentTransactionId String?
+  totalPrice           Int
+  status               OrderStatus   @default(PENDING)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 
   @@index([userId])
   @@map("orders")
@@ -195,15 +186,17 @@ type ShippingInfo {
   email    String
   phone    String
   address  String
-  note     String @default("")
+  ward     String
+  province String
+  note     String? @default("")
 }
 
 type OrderItem {
-  productId String?  @db.ObjectId
+  productId String? @db.ObjectId
   name      String
   quantity  Int
   image     String
-  price     Float
+  price     Int
   color     String?
 }
 
@@ -212,4 +205,31 @@ enum OrderStatus {
   PROCESSING @map("Processing")
   SHIPPED    @map("Shipped")
   DELIVERED  @map("Delivered")
+  CANCELLED  @map("Cancelled")
+}
+
+enum PaymentStatus {
+  UNPAID   @map("Unpaid")
+  PAID     @map("Paid")
+  FAILED   @map("Failed")
+  REFUNDED @map("Refunded")
+}
+
+enum PaymentMethod {
+  COD     @map("cod")
+  BANK    @map("bank")
+  ZALOPAY @map("zalopay")
+  VNPAY   @map("vnpay")
+}
+
+model Blog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String   @unique
+  description String?
+  content     String
+  thumbnail   String?
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

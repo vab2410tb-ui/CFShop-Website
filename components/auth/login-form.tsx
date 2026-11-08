@@ -1,13 +1,14 @@
 "use client"
 
 import * as z from "zod";
+import { useRouter } from "next/navigation";
 import Link  from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition, useState } from "react"; // 
 import { useSearchParams } from "next/navigation";
 import { login } from "@/actions/auth/login"
-import { LoginSchema } from "@/schemas";
+import { LoginSchema } from "@/schemas/auth.schema";
 import { Input } from "../ui/input";
 import { 
     Form, 
@@ -17,13 +18,13 @@ import {
     FormLabel,
     FormMessage
 } from "@/components/ui/form"
-
 import { CardWrapper } from "@/components/auth/card-wrapper"
 import { Button } from "../ui/button";
 import { FormError } from "@/components/form-error"; 
 import { FormSuccess } from "@/components/form-success"; 
 
 export const LoginForm = () => {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked" 
         ? "Email already in use with different provider!"
@@ -54,14 +55,24 @@ export const LoginForm = () => {
                         setError(res.error);
                     }
 
+                    if (res?.twoFactor) {
+                        setShowTwoFactor(true);
+                        setSuccess(
+                            "A verification code has been sent to your email."
+                    );
+                        return;
+                    }
+
+                    if (res?.redirectPath) {
+                        router.replace(res.redirectPath);
+                        router.refresh();
+                        return;
+                    }
                     if(res?.success) {
                         form.reset();
                         setSuccess(res.success);
                     }
 
-                    if(res?.twoFactor) {
-                        setShowTwoFactor(true)
-                    }
                 })
                 .catch(()=> setError("Something went wrong!"))
         });
@@ -86,7 +97,7 @@ export const LoginForm = () => {
                                     control={form.control}
                                     name="code"
                                     render={({field}) => (
-                                        <FormItem>
+                                        <FormItem className="space-y-2">
                                             <FormLabel>Two Factor Code</FormLabel>
                                             <FormControl>
                                                 <Input 
@@ -113,7 +124,7 @@ export const LoginForm = () => {
                                                 <Input 
                                                     {...field}
                                                     disabled={isPending}
-                                                    placeholder="nguyenvana@example.com"
+                                                    placeholder=""
                                                     type="email"
                                                 />
                                             </FormControl>
@@ -132,7 +143,7 @@ export const LoginForm = () => {
                                                 <Input 
                                                     {...field}
                                                     disabled={isPending}
-                                                    placeholder="******"
+                                                    placeholder=""
                                                     type="password"
                                                 />
                                             </FormControl>
@@ -160,7 +171,7 @@ export const LoginForm = () => {
             
                      <Button 
                         type="submit"
-                        className="w-full cursor-pointer"
+                        className="w-full cursor-pointer h-[36px]"
                         disabled={isPending}
                      >
                         Login

@@ -1,14 +1,13 @@
-
-import bcrypt from "bcryptjs"
 import type { NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import { UserRole } from "@/generated/prisma/enums";
-import { LoginSchema } from "@/schemas";
-import { getUserByEmail } from "@/data/user";
 import Google from "next-auth/providers/google"
+import { verifyCredentials } from "@/lib/auth/verify-credentials"
+import { LoginSchema } from "@/schemas/auth.schema";
+
 
 export default {
     secret: process.env.AUTH_SECRET,
+
     providers: [
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID,
@@ -19,54 +18,32 @@ export default {
                     id: profile.sub,
                     name: profile.name,
                     email: profile.email,
-                    image: profile.picture,
-                    username: profile.email.split("@")[0], 
+                    image: profile.picture, 
                 }
     }
         }),
 
         Credentials({
-            async authorize(credentials) {
-                const validatedFields = LoginSchema.safeParse(credentials);
+                async authorize(credentials) {
+                    const validatedFields = LoginSchema.safeParse(credentials);
 
-                if(validatedFields.success) {
+                    if (!validatedFields.success) {
+                        return null;
+                    }
+
                     const { email, password } = validatedFields.data;
 
-                    const user = await getUserByEmail(email);
-                    if(!user || !user.password) return null;
+                    const user = await verifyCredentials(
+                        email,
+                        password
+                    );
 
-                    const passwordMatch = await bcrypt.compare(
-                        password, 
-                        user.password,
-                    )
-                    
-                    if(passwordMatch) return user;
-                }
-                return null;
+                    if (!user) {
+                        return null;
+                    }
 
-            }
-        })
+                    return user;
+                },
+            }),
     ],
-    callbacks: {                          
-        async jwt({ token, user }) {
-            if (user) {
-                token.role = user.role;
-                token.isTwoFactorEnabled = user.isTwoFactorEnabled;
-                if (user.email) {
-                    token.username = user.email.split("@")[0];
-                } 
-            }
-            return token;
-        },
-        async session({ token, session }) {
-            if (token.role && session.user) {
-                session.user.role = token.role as UserRole;
-                
-                if (token.username) {
-                    session.user.username = token.username as string;
-                }
-            }
-            return session;
-        }
-    }
 } satisfies NextAuthConfig

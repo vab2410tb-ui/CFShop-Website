@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useCartStore } from "@/store/cart-store";
+import { useCartStore } from "@/stores/cart-store";
 import { toast } from "sonner";
 import { CartItem } from "@/types/cart";
 import { Loader2, Plus } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+
 
 type Props = {
   product: CartItem;
@@ -23,7 +24,8 @@ export default function AddToCartButton({
   disabled = false,
   showDisabledBadge = false
 }: Props) {
-  const addItem = useCartStore((state) => state.incrementItem);
+
+  const addItem = useCartStore((state) => state.addItem);
   const cartItems = useCartStore((state) => state.items); 
   const [loading, setLoading] = useState(false);
 
@@ -31,9 +33,13 @@ export default function AddToCartButton({
     (item) => item.id === product.id && item.color === product.color
   );
   const quantityInCart = itemInCart ? itemInCart.quantity : 0;
+
+  const quantityToAdd = Math.max(1, product.quantity || 1);
   
   const isOutOfStock = product.stock === 0;
+
   const isMaxInCart = quantityInCart >= product.stock && product.stock > 0;
+
   const shouldDisable = isOutOfStock || isMaxInCart || disabled;
 
   let buttonText = "Add to cart";
@@ -46,7 +52,7 @@ export default function AddToCartButton({
   const handleAddToCart = async () => {
     setLoading(true);
     try {
-      const status = addItem(product);
+      const status = addItem(product, quantityToAdd);
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       if (status === "max_stock") {

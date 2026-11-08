@@ -22,30 +22,41 @@ export interface ProductDetailProps{
 
 
 
-export async function getRandomProducts(): Promise<RandomProductProps[]> {
+export const getRandomProducts = async () => {
   try {
-    const products = await prisma.product.findMany({
-      take: 10, 
-      orderBy: {
-        createdAt: 'desc' 
-      },
-      select: {
-        id: true,
-        name: true,
-        slug:true,
-        price: true,
-        mainImage: true,
-        category: true,
-        variants: true,
-      },
+    const products = await prisma.product.aggregateRaw({
+      pipeline: [
+        {
+          $match: {
+            "variants.stock": { $gt: 0 },
+          },
+        },
+        {
+          $sample: {
+            size: 10,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            id: { $toString: "$_id" },
+            name: 1,
+            slug: 1,
+            price: 1,
+            mainImage: 1,
+            category: 1,
+            variants: 1,
+          },
+        },
+      ],
     });
 
     return products as unknown as RandomProductProps[];
   } catch (error) {
-    console.error("Failed to load products:", error);
+    console.error("Get random products failed:", error);
     return [];
   }
-}
+};
 
 export const getAllProducts = async ({
   category,

@@ -1,5 +1,4 @@
-import NextAuth from "next-auth"
-import authConfig from "./auth.config"
+
 import {
   apiAuthPrefix,
   authRoutes, 
@@ -8,7 +7,7 @@ import {
   AdminPrefix,
 } from "@/routes"
 
-const { auth } = NextAuth(authConfig)
+import { auth } from "./auth"
 
 export default auth((req) => {
 
@@ -23,14 +22,15 @@ export default auth((req) => {
   const isAuthRoute = authRoutes.includes(nextUrl.pathname)
   const isAdminRoute = nextUrl.pathname.startsWith(AdminPrefix);
   const userRole = req.auth?.user?.role
-  
+
+
   if(isApiAuthRoute) {
     return null;
   }
 
   if(isAuthRoute) {
     if(isLoggedIn) {
-      const redirectPath = userRole === "ADMIN" ? "/admin/products" : "/settings";
+      const redirectPath = userRole === "ADMIN" ? "/admin/products" : "/profile";
       return Response.redirect(new URL(redirectPath, nextUrl));
     }
     return null;
@@ -41,10 +41,21 @@ export default auth((req) => {
   }
 
   if (isAdminRoute && userRole !== "ADMIN") {
-            return Response.redirect(new URL("/settings", nextUrl)); 
+            return Response.redirect(new URL("/profile", nextUrl)); 
   }
-
-  if (nextUrl.pathname.startsWith('/settings') && userRole === "ADMIN") {
+ 
+  const restrictedUserRoutes = [
+    "/profile",
+    "/orders",
+    
+  ];
+  
+  if (
+    restrictedUserRoutes.some((route) =>
+      nextUrl.pathname.startsWith(route)
+    ) &&
+    userRole === "ADMIN"
+  ) {
     return Response.redirect(new URL("/admin/dashboard", nextUrl));
   }
     

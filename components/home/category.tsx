@@ -11,7 +11,7 @@ const Category = () => {
                     Discover Our Collection
                 </h3>
 
-                <h1 className="text-[24px] font-bold md:text-[32px] lg:text-[40px] pb-[40px]">
+                <h1 className="text-[24px] font-bold md:text-[32px] lg:text-[40px]">
                     Product categories
                 </h1>
             </div>

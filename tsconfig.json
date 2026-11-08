@@ -33,7 +33,7 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "scripts/testzalo.ts"  ],
   "exclude": [
     "node_modules"
   ]

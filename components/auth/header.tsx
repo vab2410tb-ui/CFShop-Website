@@ -8,7 +8,7 @@ export const Header = ({label}:HeaderProps) => {
     return (
         <div className="w-full flex flex-col items-center justify-center gap-y-4 ">
             <Image 
-                src="/images/image.png"
+                src="/images/logo.png"
                 width={100}
                 height={100}
                 alt="logo"

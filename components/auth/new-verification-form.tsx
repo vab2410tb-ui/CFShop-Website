@@ -3,7 +3,7 @@
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { BeatLoader } from "react-spinners";
+import { Loader2 } from "lucide-react";
 import { newVerification } from "@/actions/auth/new-verification";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
@@ -46,7 +46,9 @@ export const NewVerificationForm = () => {
             backButtonHref="/auth/login"
         >
             <div className="flex items-center w-full justify-center">
-                {!success && !error && (<BeatLoader />)}
+                {!success && !error && (
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                )}
 
                 <FormSuccess message={success}/>
                 

@@ -55,15 +55,7 @@ const CategoryPage = async ({ params, searchParams }: Props) => {
         <div className="flex justify-between items-center">
             <div className="hidden md:flex gap-4">
                 <SlidersHorizontal />
-                <div>
-                  <span>Filter</span>
-                  <span>
-                    <Link href="/">Home</Link>
-                    <Link href="/">Collection</Link>
-                    <Link href="/"></Link>
-
-                  </span>
-                </div>
+                <div>Filter</div>
             </div>
             <FilterProduct sort={validSort}/>
         </div>

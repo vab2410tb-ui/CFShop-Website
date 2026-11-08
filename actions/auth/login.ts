@@ -2,10 +2,11 @@
 
 import * as z from "zod";
 import { prisma } from "@/lib/prisma";
-import { LoginSchema } from "@/schemas/index";
+import { LoginSchema } from "@/schemas/auth.schema";
 import { signIn } from "@/auth"
 import { AuthError } from "next-auth";
 import { getUserByEmail } from "@/data/user";
+import { verifyCredentials } from "@/lib/auth/verify-credentials";
 import { generateVerificationToken, generateTwoFactorToken } from "@/lib/auth/tokens";
 import { sendTwoFactorTokenEmail, sendVerificaitonEmail } from "@/lib/services/mail";
 import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
@@ -15,6 +16,7 @@ import { getTwoFactorTokenByUserId } from "@/data/two-factor-confirmation";
 type LoginValues = z.infer<typeof LoginSchema>;
 
 export const login = async (data: LoginValues) => {
+    // Validate input
     const validatedFields = LoginSchema.safeParse(data);
     
     if(!validatedFields.success)
@@ -22,12 +24,23 @@ export const login = async (data: LoginValues) => {
 
     const { email, password, code } = validatedFields.data;
 
+    // Find user
+
     const existingUser = await getUserByEmail(email)
 
     if(!existingUser || !existingUser.email || !existingUser.password) {
-        return { error: "Email does not exits!"}
+        return { error: "Invalid email or password!"}
     }
+    
+    // Verify password before sending 2FA
+    const verifiedUser =await verifyCredentials(email,password);
 
+    if (!verifiedUser) {
+        return {
+            error: "Invalid email or password!",
+        };
+    }
+    // Verify email
     if(!existingUser.emailVerified) {
         const verificationToken = await generateVerificationToken(
             existingUser.email
@@ -36,12 +49,14 @@ export const login = async (data: LoginValues) => {
             verificationToken.email,
             verificationToken.token,
         );
-        return { success: "Confirmation email sent!"}
+        return { success: "Email not verified. New confirmation email sent!"}
     }
 
+    // Two factor authentication
     if (existingUser.isTwoFactorEnabled &&  existingUser.email) {
+
+        // User submitted OTP
         if(code) {
-            // TODO: verify code
             const twoFactorToken = await getTwoFactorTokenByEmail(
                 existingUser.email
             );
@@ -60,10 +75,12 @@ export const login = async (data: LoginValues) => {
                 return { error: "Code expired!"}
             };
 
+            // OTP is valid - Remove used OTP
             await prisma.twoFactorToken.delete({
                 where: { id: twoFactorToken.id }
             });
 
+            // Remove old confirmation
             const existingConfirmation = await getTwoFactorTokenByUserId(existingUser.id);
 
             if(existingConfirmation) {
@@ -71,14 +88,15 @@ export const login = async (data: LoginValues) => {
                     where: {id : existingConfirmation.id}
                 })
             };
-
+            
+            // Create new confirmation
             await prisma.twoFactorConfirmation.create({
                 data: {
                     userId: existingUser.id
                 }
             });
 
-
+        // User has not entered OTP yet
         } else {
             const twoFactorToken = await generateTwoFactorToken(existingUser.email);
 
@@ -91,15 +109,20 @@ export const login = async (data: LoginValues) => {
         }
 
     }
-
+    // Login with Auth
     try {
-        const redirectPath = existingUser.role === "ADMIN" ? "/admin/product" : "/settings";
-
         await signIn("credentials", {
             email, 
             password,
-            redirectTo: redirectPath
+            redirect: false,
         });
+
+        const redirectPath = existingUser.role === "ADMIN" ? "/admin/products" : "/profile";
+
+        return {
+            success: "Login successful!",
+            redirectPath
+        }
     } catch (error) {
         if (error instanceof AuthError){
             switch (error.type) {
@@ -110,6 +133,8 @@ export const login = async (data: LoginValues) => {
             }
         }
         
-        throw error;
+        console.error("LOGIN_ERROR:", error);
+
+        return {error:"Something went wrong!",};
     }
 }

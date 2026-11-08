@@ -2,7 +2,7 @@
 
 import bcrypt from "bcryptjs"
 import * as z from "zod";
-import { RegisterSchema } from "@/schemas/index";
+import { RegisterSchema } from "@/schemas/auth.schema";
 import { prisma } from "@/lib/prisma";
 import { getUserByEmail } from "@/data/user"
 import { generateVerificationToken } from "@/lib/auth/tokens";
@@ -38,6 +38,6 @@ export const register = async (data: RegisterValues) => {
         verificationToken.email,
         verificationToken.token,
     );
-    return { success: "Confirmation email sent!", error: undefined}
+    return { success: "Please check your email to confirm your account!", error: undefined}
 
 }

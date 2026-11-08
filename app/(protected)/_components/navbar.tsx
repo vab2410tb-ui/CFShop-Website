@@ -4,48 +4,44 @@ import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@/components/auth/user-button";
 import Link from "next/link";
+import Image from "next/image";
 
 export const Navbar = () => {
     const pathname = usePathname()
+
     return (
-        <nav 
-            className="bg-secondary flex 
-            justify-between items-center p-4 rounded-xl w-[600px] shadow-sm"
-        >
+        <nav className="bg-white flex justify-between items-center p-4 w-full shadow-sm px-[max(48px,calc(50%-600px))]">
+           <Link href="/">
+                <div className="relative w-[90px] h-[50px]">
+                    <Image
+                        src="/images/logo.png"
+                        alt="Product"
+                        fill
+                        className="object-contain"
+                    />
+                </div>
+            </Link>
+ 
             <div className="flex gap-x-2">
                 <Button
                     asChild
-                    variant={pathname === "/server" ? "default" : "outline"}
+                    variant={pathname.startsWith("/orders") ? "default" : "outline"}
                 >
-                    <Link href="/server">
-                        Server
+                    <Link href="/orders">
+                        Orders
                     </Link>
                 </Button>
+
                 <Button
                     asChild
-                    variant={pathname === "/client" ? "default" : "outline"}
+                    variant={pathname === "/profile" ? "default" : "outline"}
                 >
-                    <Link href="/client">
-                        Client
+                    <Link href="/profile">
+                        Profile
                     </Link>
                 </Button>
-                <Button
-                    asChild
-                    variant={pathname === "/admin" ? "default" : "outline"}
-                >
-                    <Link href="/admin">
-                        Admin
-                    </Link>
-                </Button>
-                <Button
-                    asChild
-                    variant={pathname === "/settings" ? "default" : "outline"}
-                >
-                    <Link href="/settings">
-                        Setting
-                    </Link>
-                </Button>
-            </div>
+            </div>  
+          
             <UserButton/>
 
         </nav>

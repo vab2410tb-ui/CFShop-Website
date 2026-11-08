@@ -4,7 +4,7 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition, useState } from "react";
-import { NewPasswordSchema } from "@/schemas/index";
+import { NewPasswordSchema } from "@/schemas/auth.schema";
 import { Input } from "../ui/input";
 import { newPassword } from "@/actions/auth/new-password"
 import { 

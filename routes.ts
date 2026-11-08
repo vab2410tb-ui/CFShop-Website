@@ -6,23 +6,28 @@
 
 export const publicRoutes = [
     "/",
-    "/products/",
+    "/products",
+    "/pages/order",
     "/collections",
     "/collections/all",
     "/warranty",
     "/auth/session",
     "/auth/new-verification",
     "/videos/video.mp4",
+    "/contact",
+    "/blog"
 ]
 
 export const publicRoutePrefixes = [
-  "/collections/",
-  "/products/",
+  "/collections",
+  "/products",
+  "/checkout",
+  "/blog"
 ];
 
 /**
  * An array of routes that are used for authentication
- * These routes will redirect logged in users to /settings
+ * These routes will redirect logged in users to /profile
  * @type {string[]}
  */
 export const authRoutes = [
@@ -47,4 +52,4 @@ export const AdminPrefix = "/admin";
  * The default redirect path after logging in 
  * @type {string}
  */
-export const DEFAULT_LOGIN_REDIRECT = "/settings";
+export const DEFAULT_LOGIN_REDIRECT = "/profile";

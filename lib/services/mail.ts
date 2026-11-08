@@ -32,13 +32,36 @@ export const sendVerificaitonEmail = async (
     email: string,
     token: string
 ) => {
-    const confirmLink = `http://localhost:3000/auth/new-verification?token=${token}`
-    await resend.emails.send({
-        from: "onboarding@resend.dev",
-        to: email,
-        subject: "Confirm your email",
-        html: `<p> Click <a href="${confirmLink}">here</a> to confirm email.</p>`
-    })
-}   
+    const confirmLink =
+        `http://localhost:3000/auth/new-verification?token=${token}`;
+
+    try {
+        const result = await resend.emails.send({
+            from: "onboarding@resend.dev",
+            to: email,
+            subject: "Confirm your email",
+            html: `
+                <p>Click 
+                    <a href="${confirmLink}">
+                        here
+                    </a> 
+                    to confirm your email.
+                </p>
+            `,
+        });
+
+        console.log("RESEND RESULT:", result);
+
+        if (result.error) {
+            console.error("RESEND ERROR:", result.error);
+            return { error: result.error.message };
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error("SEND EMAIL ERROR:", error);
+        return { error: "Failed to send email" };
+    }
+}; 
 
  

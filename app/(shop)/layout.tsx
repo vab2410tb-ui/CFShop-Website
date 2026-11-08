@@ -8,7 +8,7 @@ export default function ShopLayout({
 }) { 
     return (
     <>
-      <div className="z-30">
+      <div className="z-20">
         <Navigation  />
       </div>
       <main className="mt-22.5 z-10">{children}</main>

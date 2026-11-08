@@ -44,7 +44,7 @@ export const CardWrapper = ({
                     <Social/>
                 </CardFooter>
             )}
-            <CardFooter className="bg-white border-none pt-8 pb-0 p-0 tablet:pb-8">
+            <CardFooter className="bg-white border-none pt-8 pb-0 p-0 mb-2">
                 <BackButton 
                     href={backButtonHref}
                     label={backButtonLabel}

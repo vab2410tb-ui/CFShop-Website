@@ -90,8 +90,8 @@ const ProductFilter = ({ sort = "default" }: SearchFiltersProps) => {
     <div className="w-full">
 
       {/* Responsive: DESKTOP */}
-      <div className="hidden md:flex justify-end items-center">
-        <DropdownMenu>
+      <div className="hidden md:flex justify-end items-center cursor-pointer">
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
@@ -178,6 +178,57 @@ const ProductFilter = ({ sort = "default" }: SearchFiltersProps) => {
                         className="w-full justify-start py-6 text-sm"
                       >
                         Espresso Machine
+                      </Button>
+                      <Button
+                        variant={
+                          tempCategory === "grinder-machine"
+                            ? "default"
+                            : "outline"
+                        }
+                        onClick={() =>
+                          setTempCategory(
+                            tempCategory === "grinder-machine"
+                              ? ""
+                              : "grinder-machine"
+                          )
+                        }
+                        className="w-full justify-start py-6 text-sm"
+                      >
+                        Grinder Machine
+                      </Button>
+                      <Button
+                        variant={
+                          tempCategory === "coffee-beans"
+                            ? "default"
+                            : "outline"
+                        }
+                        onClick={() =>
+                          setTempCategory(
+                            tempCategory === "coffee-beans"
+                              ? ""
+                              : "coffee-beans"
+                          )
+                        }
+                        className="w-full justify-start py-6 text-sm"
+                      >
+                        Coffee Beans
+                      </Button>
+                      <Button
+                        variant={
+                          tempCategory === "accessories"
+                            ? "default"
+                            : "outline"
+                        }
+                        onClick={() =>
+                          setTempCategory(
+                            tempCategory === "accessories"
+                              ? ""
+                              : "accessories"
+                          )
+                        }
+                        className="w-full justify-start py-6 text-sm"
+                      >
+                        Accessories
                       </Button>
                     </div>
                   </div>

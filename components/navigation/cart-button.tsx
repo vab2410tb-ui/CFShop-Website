@@ -1,5 +1,5 @@
 import { ShoppingBag } from "lucide-react";
-import { useTotalItems } from "@/store/cart-store";
+import { useTotalItems } from "@/stores/cart-store";
 import { useEffect, useState } from "react";
 
 type ShoppingProps = {
@@ -17,6 +17,7 @@ const CartButton = ( {setCartOpen}:ShoppingProps ) => {
 
         return () => clearTimeout(timer);
     }, [totalItems])
+    
     return(
         <>
             <button onClick={() => setCartOpen(true)} className="relative cursor-pointer">

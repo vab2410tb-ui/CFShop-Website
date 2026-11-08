@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { Product} from "@/schemas/index"; 
+import { Product} from "@/schemas/product.schema"; 
 
 const generateSlug = (name: string) => {
   return name
@@ -13,70 +13,64 @@ const generateSlug = (name: string) => {
     .replace(/^-+|-+$/g, "");
 };
 
+
 export const saveProduct = async (data: Product, id?: string) => {
   try {
-      if (id) {
-        await prisma.product.update({
-          where: { id },
-          data: {
-            name: data.name,
-            slug: generateSlug(data.name),
-            price: Number(data.price),
-            sku: data.sku,
-              brand: data.brand,
-              category: data.category as "ESPRESSO_MACHINE" | "GRINDER_MACHINE" | "COFFEE_BEANS" | "ACCESSORIES",
-              mainImage: data.mainImage,
-              variants: data.variants,
-              detailImages: data.detailImages,
-              lifestyleImages: data.lifestyleImages,
-              description: {
-                  productFeatures: data.description.productFeatures,
-                  introText: data.description.introText,
-                  highlightFeatures: data.description.highlightFeatures,
-                  essentialFeatures: data.description.essentialFeatures,
-              },
-              techSpecs: data.techSpecs || {} 
-            }
-        })
-      }
-      else{
-        await prisma.product.create({
-          data: {
-            name: data.name,
-            slug: generateSlug(data.name),
-            price: Number(data.price), 
-            sku: data.sku,
-            brand: data.brand,
-            category: data.category as "ESPRESSO_MACHINE" | "GRINDER_MACHINE" | "COFFEE_BEANS" | "ACCESSORIES",
-            mainImage: data.mainImage,
-            variants: data.variants,
-            detailImages: data.detailImages,
-            lifestyleImages: data.lifestyleImages,
-            description: {
-                productFeatures: data.description.productFeatures,
-                introText: data.description.introText,
-                highlightFeatures: data.description.highlightFeatures,
-                essentialFeatures: data.description.essentialFeatures,
-            },
-            techSpecs: data.techSpecs || {} 
-          
-          }
-        })
-      }
+    const inStock = data.variants.some(
+      (variant) => variant.stock > 0
+    );
 
-    revalidatePath("/admin/products/all"); 
-    
+    const productData = {
+      name: data.name,
+      slug: generateSlug(data.name),
+      price: Number(data.price),
+      sku: data.sku,
+      brand: data.brand,
+      category: data.category as
+        | "ESPRESSO_MACHINE"
+        | "GRINDER_MACHINE"
+        | "COFFEE_BEANS"
+        | "ACCESSORIES",
+      mainImage: data.mainImage,
+      variants: data.variants,
+      detailImages: data.detailImages,
+      lifestyleImages: data.lifestyleImages,
+      description: {
+        productFeatures: data.description.productFeatures,
+        introText: data.description.introText,
+        highlightFeatures: data.description.highlightFeatures,
+        essentialFeatures: data.description.essentialFeatures,
+      },
+      techSpecs: data.techSpecs || {},
+      inStock,
+    };
+
+    if (id) {
+      await prisma.product.update({
+        where: { id },
+        data: productData,
+      });
+    } else {
+      await prisma.product.create({
+        data: productData,
+      });
+    }
+
+    revalidatePath("/admin/products/all");
+
     return { success: true };
-  } catch (error: unknown) { 
-    console.error("Create product failed:", error);
+  } catch (error: unknown) {
+    console.error("Save product failed:", error);
 
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : "Failed to save product!";
-      
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Failed to save product!";
+
     return { error: errorMessage };
   }
 };
+
 
 export const deleteProduct = async (id: string) => {
   try {

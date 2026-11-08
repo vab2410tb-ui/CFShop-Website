@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation";
-import { ChevronRight, LayoutDashboard, Package,ShoppingCart, User } from "lucide-react"
+import { ChevronRight, LayoutDashboard, Package, ShoppingCart, User, Newspaper } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { logout } from "@/actions/auth/logout";
 import {
@@ -20,7 +20,7 @@ import {
   SidebarFooter,
   useSidebar
 } from "@/components/ui/sidebar"
-
+import { PanelLeftIcon } from "lucide-react"
 import {
   Collapsible,
   CollapsibleContent,
@@ -37,18 +37,6 @@ export function AppSidebar() {
     
     return (
         <>
-            {isMobile && (
-                <div className="p-4 bg-gray-100 z-50 fixed top-0 left-0 right-0">
-                    <p>Trạng thái: {openMobile ? "Mở" : "Đóng"}</p>
-                    <button 
-                        onClick={toggleSidebar}
-                        className="bg-slate-900 text-white px-4 py-2 mt-2 rounded"
-                    >
-                        Đóng/Mở Sidebar
-                    </button>
-                </div>
-            )}
-        
             <Sidebar>
                 <SidebarHeader>
                     <p className="p-2 font-bold text-xl">
@@ -103,17 +91,8 @@ export function AppSidebar() {
                                                         </Link>
                                                     </SidebarMenuSubButton>
                                                 </SidebarMenuSubItem>
-
-                                                <SidebarMenuSubItem>
-                                                    <SidebarMenuSubButton asChild isActive={pathname === "/admin/products/categories"}>
-                                                        <Link href="/admin/categories">
-                                                            <span className="text-base">Categories</span>
-                                                        </Link>
-                                                    </SidebarMenuSubButton>
-                                                </SidebarMenuSubItem>
                                             </SidebarMenuSub>
                                         </CollapsibleContent>
-
                                     </Collapsible>
                                 </SidebarMenuItem>
                             </SidebarMenu>
@@ -156,6 +135,25 @@ export function AppSidebar() {
                             </SidebarMenu>
                     </SidebarGroup>
                     {/* END LAYOUT: USER */}
+
+                    {/* START LAYOUT: BLOG */}
+                    <SidebarGroup>
+                            <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <Collapsible className="group/collapsible" >
+                                        <CollapsibleTrigger asChild>
+                                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/blog")}>
+                                            <Link href="/admin/blog">
+                                                <Newspaper className="w-4 h-4 mr-2" />
+                                                <span className="text-lg">Blog</span>
+                                            </Link>
+                                            </SidebarMenuButton>
+                                        </CollapsibleTrigger>
+                                    </Collapsible>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                    </SidebarGroup>
+                    {/* END LAYOUT: BLOG */}
                 </SidebarContent>
 
                 <SidebarFooter>

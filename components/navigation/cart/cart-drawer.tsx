@@ -1,147 +1,464 @@
-import { X, LockKeyhole, Plus, Minus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useCartStore, useTotalItems, useTotalPrice } from "@/store/cart-store";
-import Image from "next/image";
 
+"use client";
+
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useTransition, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+    X,
+    LockKeyhole,
+    Plus,
+    Minus,
+    Loader2,
+    ShoppingBag,
+} from "lucide-react";
+import {
+    useCartStore,
+    useTotalItems,
+    useTotalPrice,
+} from "@/stores/cart-store";
 
 type ShoppingProps = {
     cartOpen: boolean;
-    onClose: (value: boolean) => void
-}
+    onClose: (value: boolean) => void;
+};
 
-export const CartDrawer = ( {cartOpen, onClose}:ShoppingProps ) => {
+const formatPrice = (price: number) => {
+    return `${(Number(price) || 0).toLocaleString("vi-VN")} đ`;
+};
+
+export const CartDrawer = ({
+    cartOpen,
+    onClose,
+}: ShoppingProps) => {
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+
     const items = useCartStore((state) => state.items);
-    const incrementItems = useCartStore((state) => state.incrementItem)
-    const decrementItems = useCartStore((state) => state.decrementItem)
-    const removeItems = useCartStore((state) => state.removeItem)
-    
+    const incrementItem = useCartStore(
+        (state) => state.incrementItem
+    );
+    const decrementItem = useCartStore(
+        (state) => state.decrementItem
+    );
+    const removeItem = useCartStore(
+        (state) => state.removeItem
+    );
+
     const totalItems = useTotalItems();
+
     const totalPrice = useTotalPrice();
 
-    const CartContent = (
+    useEffect(() => {
+        if (!cartOpen) return;
+
+        const originalOverflow = document.body.style.overflow;
+
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = originalOverflow;
+        };
+    }, [cartOpen]);
+
+    /* Checkout */
+    const handleCheckout = () => {
+        if (isPending || items.length === 0) return;
+        
+        onClose(false);
+
+        startTransition(() => {
+            router.push("/pages/order");
+        });
+    };
+
+    return (
         <>
-            <div className="flex flex-col justify-around m-[40px] pb-1 bg-white h-auto">
-                {/* Header Cart */}
-                <div>
-                    <div className="flex justify-between items-center pb-[32px]">
-                        <div className="text-[20px] flex gap-2 items-center">
+            {/* OVERLAY */}
+            <div
+                aria-hidden={!cartOpen}
+                onClick={() => onClose(false)}
+                className={`
+                    fixed inset-0 z-40
+                    bg-black/50
+                    transition-opacity duration-300
+                    ${
+                        cartOpen
+                            ? "visible opacity-100"
+                            : "invisible opacity-0"
+                    }
+                `}
+            />
+
+            {/* DRAWER */}
+            <aside
+                role="dialog"
+                aria-modal="true"
+                aria-label="Shopping cart"
+                className={`
+                    fixed z-50
+                    flex flex-col
+                    overflow-hidden
+                    bg-white
+
+                    /* Mobile */
+                    inset-0
+                    rounded-none
+                    transition-transform duration-300 ease-out
+
+                    ${
+                        cartOpen
+                            ? "translate-y-0"
+                            : "-translate-y-full"
+                    }
+
+                    /* Desktop */
+                    mb:left-auto
+                    mb:right-[10px]
+                    mb:top-[10px]
+                    mb:bottom-[10px]
+                    mb:w-[650px]
+                    mb:rounded-xl
+                    mb:shadow-2xl
+                    mb:translate-y-0
+
+                    ${
+                        cartOpen
+                            ? "mb:translate-x-0"
+                            : "mb:translate-x-[110%]"
+                    }
+                `}
+            >
+                {/* HEADER */}
+                <header className="flex shrink-0 items-center justify-between border-b px-5 py-4 mb:px-6">
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-neutral-900">
                             Cart
-                            <div className="flex w-[25px] h-[25px]  items-center justify-center rounded-full bg-black text-[12px] text-white">
-                                {totalItems}
-                            </div>
-                        </div>
-                        <Button 
-                            onClick={()=>onClose(false)}
-                            variant="ghost"
+                        </h2>
+
+                        <span
+                            className="
+                                flex h-6 min-w-6
+                                items-center justify-center
+                                rounded-full
+                                bg-black
+                                px-1.5
+                                text-xs
+                                font-medium
+                                text-white
+                            "
                         >
-                            <X/>
-                        </Button>
+                            {totalItems}
+                        </span>
                     </div>
-                    {/* Body Cart */}
-                    <div className="flex flex-col flex-1 gap-5 max-h-[200px] overflow-y-auto pr-2 mb:min-h-[600px]">
-                        {items.length === 0 ? (
-                            <p>Your cart is empty</p>
-                        ) : (
-                            items.map((item) => (
-                                <div key={`${item.id}-${item.color}`} className="flex justify-between h-[auto]">
-                                    <div className="flex gap-5">
-                                        <div className="relative w-[96px] h-[96px] md:w-[128px] md:h-[128px] rounded-[10px]">
-                                            <Image 
-                                                src={item.image || "/placeholder.png"} 
-                                                alt={item.name} 
+
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onClose(false)}
+                        aria-label="Close shopping cart"
+                        className="rounded-full"
+                    >
+                        <X className="h-5 w-5 cursor-pointer" />
+                    </Button>
+                </header>
+
+                {/* Body Cart */}
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                    {items.length === 0 ? (
+                        <EmptyCart />
+                    ) : (
+                        <div className="flex flex-col gap-5 px-5 py-5 mb:px-6">
+                            {items.map((item) => {
+                                const isMaxStock =
+                                    item.quantity >= item.stock;
+
+                                const hasColor =
+                                    Boolean(item.color) &&
+                                    item.color !== "Default";
+
+                                return (
+                                    <div
+                                        key={`${item.id}-${item.color || "default"}`}
+                                        className="
+                                            flex
+                                            gap-3
+                                            border-b
+                                            pb-5
+                                            last:border-b-0
+                                            last:pb-0
+                                            mb:gap-4
+                                        "
+                                    >
+                                        {/* PRODUCT IMAGE */}
+                                        <div
+                                            className="
+                                                relative
+                                                h-24
+                                                w-24
+                                                shrink-0
+                                                overflow-hidden
+                                                rounded-xl
+                                                bg-neutral-100
+                                                mb:h-28
+                                                mb:w-28
+                                            "
+                                        >
+                                            <Image
+                                                src={
+                                                    item.image ||
+                                                    "/placeholder.png"
+                                                }
+                                                alt={item.name}
                                                 fill
-                                                priority={Boolean(item.image)}
+                                                sizes="
+                                                    (max-width: 767px) 96px,
+                                                    112px
+                                                "
                                                 className="object-contain"
                                             />
                                         </div>
-                                        <div className="flex flex-col gap-1">
-                                            <h3 className="text-[14px] text-[#333333B3]">{item.name}</h3>
-                                            <span>Color: {item.color}</span>
-                                            <p className="text-[14px] text-[#333333B3]">{(item.price || 0).toLocaleString("vi-VN")} đ</p>
-                                            {item.quantity >= item.stock && (
-                                            <p className="mt-1 text-[14px] text-red-500">
-                                                Only {item.quantity} item(s) added due to stock availability.
-                                            </p>
-                                        )}
-                                        </div>
-                                        
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <div className="flex gap-2 items-center">
-                                            <Button 
-                                                disabled={item.quantity <= 1}
-                                                onClick={() => decrementItems(item.id, item.color)}
-                                                className="w-7 h-8"
-                                            >
-                                                <Minus className="w-5 h-5"/>
-                                            </Button>
-                                            
-                                            <div>
-                                                <p className="border-[1px] px-5 py-2 rounded-[10px]">{item.quantity}</p>
+
+                                        {/* PRODUCT INFO */}
+                                        <div className="flex min-w-0 flex-1 flex-col">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <h3
+                                                    className="
+                                                        line-clamp-2
+                                                        text-sm
+                                                        font-medium
+                                                        leading-5
+                                                        text-neutral-900
+                                                    "
+                                                >
+                                                    {item.name}
+                                                </h3>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        removeItem(
+                                                            item.id,
+                                                            item.color
+                                                        )
+                                                    }
+                                                    aria-label={`Remove ${item.name}`}
+                                                    className="
+                                                        shrink-0
+                                                        text-neutral-400
+                                                        transition-colors
+                                                        hover:text-red-500
+                                                    "
+                                                >
+                                                    <X className="h-4 w-4 cursor-pointer" />
+                                                </button>
                                             </div>
-                                            <Button 
-                                                disabled={item.quantity >= item.stock}
-                                                onClick={() => incrementItems(item)}
-                                                className="w-7 h-8"
-                                            >
-                                                <Plus className="w-5 h-5"/>
-                                            </Button>
+
+                                            {hasColor && (
+                                                <p className="mt-1 text-xs text-neutral-500">
+                                                    Color:{" "}
+                                                    <span className="text-neutral-700">
+                                                        {item.color}
+                                                    </span>
+                                                </p>
+                                            )}
+
+                                            <p className="mt-1 text-sm font-medium text-neutral-700">
+                                                {formatPrice(item.price)}
+                                            </p>
+
+                                            {/* QUANTITY */}
+                                            <div className="mt-auto flex items-end justify-between gap-3 pt-3">
+                                                <div
+                                                    className="
+                                                        flex
+                                                        h-8
+                                                        items-center
+                                                        overflow-hidden
+                                                        rounded-lg
+                                                        border
+                                                        border-neutral-200
+                                                    "
+                                                >
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            item.quantity <=
+                                                            1
+                                                        }
+                                                        onClick={() =>
+                                                            decrementItem(
+                                                                item.id,
+                                                                item.color
+                                                            )
+                                                        }
+                                                        aria-label="Decrease quantity"
+                                                        className="
+                                                            h-8
+                                                            w-8
+                                                            rounded-none
+                                                            hover:bg-neutral-100
+                                                        "
+                                                    >
+                                                        <Minus className="h-3.5 w-3.5" />
+                                                    </Button>
+
+                                                    <span
+                                                        className="
+                                                            flex
+                                                            h-full
+                                                            min-w-8
+                                                            items-center
+                                                            justify-center
+                                                            border-x
+                                                            border-neutral-200
+                                                            px-2
+                                                            text-sm
+                                                            font-medium
+                                                        "
+                                                    >
+                                                        {item.quantity}
+                                                    </span>
+
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            isMaxStock
+                                                        }
+                                                        onClick={() =>
+                                                            incrementItem(
+                                                                item
+                                                            )
+                                                        }
+                                                        aria-label="Increase quantity"
+                                                        className="
+                                                            h-8
+                                                            w-8
+                                                            rounded-none
+                                                            hover:bg-neutral-100
+                                                        "
+                                                    >
+                                                        <Plus className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </div>
+
+                                            </div>
+
+                                            {/* stock message */}
+                                            {isMaxStock && (
+                                                <p className="mt-2 text-xs text-red-500">
+                                                    Maximum available stock
+                                                    reached.
+                                                </p>
+                                            )}
+
+                                            <span className="text-sm font-semibold text-neutral-900 text-end">
+                                                {formatPrice(
+                                                    item.price *
+                                                        item.quantity
+                                                )}
+                                            </span>
                                         </div>
-                                        <Button 
-                                            variant="ghost"
-                                            onClick={()=>removeItems(item.id, item.color)}
-                                            className="bg-white text-[#333]  hover:text-gray-400 transform ease-in-out"
-                                        >
-                                            Remove
-                                        </Button>
                                     </div>
-                                    
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-                {/* Footer Cart */}
-                <div className="border-t-1 ">
-                    <div className=" flex flex-col gap-10 mt-[24px] mb-[40px]">
-                        <div className=" flex justify-between font-bold mb:text-[20px]">
-                            <span>Total:</span>
-                            {(Number(totalPrice) || 0).toLocaleString("vi-VN")} đ
+                                );
+                            })}
                         </div>
-                        <Button className="w-full h-[50px] rounded-[20px] text-[16px] font-bold">
-                            <LockKeyhole/>
-                            Checkout
-                        </Button>
-                    </div>
+                    )}
                 </div>
-            </div>    
+
+                {/* Footer Cart */}
+                {items.length > 0 && (
+                    <footer
+                        className="
+                            shrink-0
+                            border-t
+                            bg-white
+                            px-5
+                            py-5
+                            mb:px-6
+                            mb:py-6
+                        "
+                    >
+                        <div className="flex items-center justify-between">
+                            <span className="text-base font-medium text-neutral-600">
+                                Total
+                            </span>
+
+                            <span className="text-lg font-bold text-neutral-900">
+                                {formatPrice(totalPrice)}
+                            </span>
+                        </div>
+
+                        <Button
+                            type="button"
+                            onClick={handleCheckout}
+                            disabled={
+                                isPending ||
+                                status === "loading"
+                            }
+                            className="
+                                mt-5
+                                h-12
+                                w-full
+                                rounded-xl
+                                bg-black
+                                text-base
+                                font-semibold
+                                text-white
+                                hover:bg-neutral-900
+                            "
+                        >
+                            {isPending ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Processing...
+                                </>
+                            ) : (
+                                <>
+                                    <LockKeyhole className="mr-2 h-4 w-4" />
+                                    Checkout
+                                </>
+                            )}
+                        </Button>
+
+                        <p className="mt-3 text-center text-xs text-neutral-400">
+                            Secure checkout · Your information is protected
+                        </p>
+                    </footer>
+                )}
+            </aside>
         </>
-    )
-    return(
-        <>
-            <div 
-                className={`fixed inset-0 bg-black/50 z-10 ${cartOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
-                onClick={() => onClose(false)}    
-            />
+    );
+};
+
+// Empty Cart
+const EmptyCart = () => {
+    return (
+        <div className="flex h-full min-h-[400px] flex-col items-center justify-center px-6 text-center">
             <div
-                className={`
-                    mb:hidden
-                    h-[full]
-                    fixed inset-0
-                    z-50
-                    bg-white
-                    transition-transform
-                    duration-500
-                    ease-in-out
-                    ${cartOpen ? "translate-y-0" : "-translate-y-full"}
-                `}
+                className="
+                    flex
+                    h-16
+                    w-16
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-neutral-100
+                "
             >
-                {CartContent}
+                <ShoppingBag className="h-7 w-7 text-neutral-400" />
             </div>
-            <div className= {`hidden mb:block fixed overflow-hidden left-auto right-[10px] top-[10px] h-[calc(100dvh-20px)] w-[650px] rounded-[10px] z-50 bg-white transition-transform duration-500 ease-in-out ${cartOpen ? "translate-x-0" : "translate-x-[110%]"} `}>
-               {CartContent}
-            </div>
-            
-        </>
-    )
-}
+
+            <h3 className="mt-5 text-base font-semibold text-neutral-900">
+                Your cart is empty
+            </h3>
+        </div>
+    );
+};
+

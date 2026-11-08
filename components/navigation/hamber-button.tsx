@@ -37,7 +37,7 @@ export const HamberButton = ({
 
         <SheetContent
           side="left"
-          className="w-[300px] overflow-y-auto pt-12 sm:w-[350px] px-6 pt-10 pb-6 text-[22px]"
+          className="w-[300px] overflow-y-auto px-6 pt-10 pb-6 text-[22px] sm:w-[350px]"
         >
           <SheetTitle className="sr-only">Menu</SheetTitle>
 
@@ -127,14 +127,8 @@ export const HamberButton = ({
             </li>
 
             <li>
-              <Link href="/news" onClick={closeMenu}>
-                News
-              </Link>
-            </li>
-
-            <li>
-              <Link href="/display" onClick={closeMenu}>
-                Display
+              <Link href="/blog" onClick={closeMenu}>
+                Blog
               </Link>
             </li>
           </ul>

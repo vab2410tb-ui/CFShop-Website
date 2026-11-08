@@ -8,5 +8,4 @@ export interface CartItem {
   stock: number;
   color: string; 
   colorCode?: string;
-  
 }

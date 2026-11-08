@@ -4,7 +4,7 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition, useState } from "react"; // 1. Bổ sung useState ở đây
-import { ResetSchema } from "@/schemas/index";
+import { ResetSchema } from "@/schemas/auth.schema";
 import { Input } from "../ui/input";
 import { reset } from "@/actions/auth/reset"
 import { 
@@ -65,12 +65,12 @@ export const ResetForm = () => {
                             name="email"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel>Email Address</FormLabel>
                                     <FormControl>
                                         <Input 
                                             {...field}
                                             disabled={isPending}
-                                            placeholder="john.doe@example.com"
+                                            placeholder=""
                                             type="email"
                                         />
                                     </FormControl>
@@ -83,7 +83,7 @@ export const ResetForm = () => {
                     <FormError message={error}/>
                     <Button 
                         type="submit"
-                        className="w-full"
+                        className="w-full h-[36px] cursor-pointer"
                         disabled={isPending}
                     >
                         Send reset email

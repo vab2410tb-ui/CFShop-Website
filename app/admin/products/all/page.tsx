@@ -37,8 +37,9 @@ const AllProductsPage = async ({ searchParams }: SearchParams) => {
         : { createdAt: "desc" },
   });
 
+
   return (
-    <div className="min-h-screen bg-slate-50 p-5">
+    <div className="min-h-screen p-5">
       {/* HEADER */}
       <div className="mb-5 flex items-center justify-between">
         <div>
@@ -60,11 +61,12 @@ const AllProductsPage = async ({ searchParams }: SearchParams) => {
         <table className="w-full min-w-200px border-collapse text-left">
           <thead className="border-b border-slate-200 bg-slate-50">
             <tr>
-              <th className="w-[40%] p-4 font-semibold text-slate-600">Product Info</th>
-              <th className="w-[20%] p-4 text-left font-semibold text-slate-600">Category</th>
-              <th className="w-[20%] p-4 text-right font-semibold text-slate-600">Price</th>
-              <th className="w-[10%] p-4 text-center font-semibold text-slate-600">Stock</th>
-              <th className="w-[10%] p-4 text-center font-semibold text-slate-600">Actions</th>
+              <th className="w-[30%] p-4 font-semibold">Product Info</th>
+              <th className="w-[10%] p-4 text-left font-semibold">Color</th>
+              <th className="w-[20%] p-4 text-left font-semibold">Category</th>
+              <th className="w-[20%] p-4 text-right font-semibold">Price</th>
+              <th className="w-[10%] p-4 text-center font-semibold">Stock</th>
+              <th className="w-[10%] p-4 text-center font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -75,70 +77,96 @@ const AllProductsPage = async ({ searchParams }: SearchParams) => {
                 </td>
               </tr>
             ) : (
-              products.map((p) => (
-                <tr key={p.id} className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  
-                  {/* Product Info */}
-                  <td className="flex items-center gap-4 p-4">
-                    <Image
-                      src={p.mainImage || "/placeholder.png"}
-                      width={50}
-                      height={50}
-                      className="rounded-lg border border-slate-200 object-cover"
-                      alt={p.name}
-                    />
-                    <div>
-                      <div className="text-[15px] font-semibold text-slate-900">{p.name}</div>
-                      <div className="text-[13px] text-slate-500">SKU: {p.sku}</div>
-                    </div>
-                  </td>
+              products.flatMap((p) =>
+                p.variants.map((v) => (
+                  <tr
+                    key={`${p.id}-${v.colorCode}`}
+                    className="border-b border-slate-100 transition-colors hover:bg-slate-50/50"
+                  >
+                    {/* Product Info */}
+                    <td className="p-4">
+                      <div className="flex items-center gap-4">
+                        {v.images[0] && (
+                          <Image
+                            src={v.images[0]}
+                            alt={`${p.name} - ${v.color}`}
+                            width={50}
+                            height={50}
+                          />
+                        )}
 
-                  {/* Category */}
-                  <td className="p-4 text-left">
-                    <span className="rounded-full bg-sky-100 px-3 py-1 text-[12px] font-semibold uppercase text-sky-700">
-                      {p.category.replace("_", " ")}
-                    </span>
-                  </td>
+                        <div>
+                          <div className="text-[15px] font-semibold text-slate-900">
+                            {p.name} {v.color}
+                          </div>
+                          <div className="text-[13px] text-slate-500">
+                            SKU: {p.sku}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
 
-                  {/* Price */}
-                  <td className="p-4 text-right font-semibold text-slate-900">
-                    {p.price ? Number(p.price).toLocaleString("vi-VN") : 0} ₫
-                  </td>
+                    <td className="p-4 text-left font-semibold text-slate-900">
 
-                  {/* Stock */}
-                  <td className="p-4 text-center font-semibold text-slate-900">
-                    {p.inStock ? Number(p.inStock).toLocaleString("vi-VN") : 0}
-                  </td>
+                        {v.color ? v.color : "-"}
+                    </td>
 
-                  {/* Actions */}
-                  <td className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-3">
-                      <Link
-                        href={`/admin/products/add?editId=${p.id}`}
-                        className="flex items-center justify-center rounded p-2 text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                    {/* Category */}
+                    <td className="p-4 text-left">
+                      <span className="rounded-full bg-sky-100 px-3 py-1 text-[12px] font-semibold uppercase text-sky-700">
+                        {p.category.replace("_", " ")}
+                      </span>
+                    </td>
+
+                    {/* Price */}
+                    <td className="p-4 text-right font-semibold text-slate-900">
+                      {p.price
+                        ? Number(p.price).toLocaleString("vi-VN")
+                        : 0}{" "}
+                      ₫
+                    </td>
+
+                    {/* Stock */}
+                    <td className="p-4 text-center">
+                      <span
+                        className={`inline-block rounded-[10px] px-3 py-1 text-sm font-semibold ${
+                          Number(v.stock) > 0
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
                       >
-                        <Edit className="h-5 w-5" />
-                      </Link>
+                        {Number(v.stock)}
+                      </span>
+                    </td>
 
-                      <form
-                        action={async () => {
-                          "use server";
-                          await deleteProduct(p.id);
-                        }}
-                        className="m-0 flex"
-                      >
-                        <button
-                          type="submit"
-                          className="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
+                    {/* Actions */}
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-3">
+                        <Link
+                          href={`/admin/products/add?editId=${p.id}`}
+                          className="flex items-center justify-center rounded p-2 text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
                         >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                  
-                </tr>
-              ))
+                          <Edit className="h-5 w-5" />
+                        </Link>
+
+                        <form
+                          action={async () => {
+                            "use server";
+                            await deleteProduct(p.id);
+                          }}
+                          className="m-0 flex"
+                        >
+                          <button
+                            type="submit"
+                            className="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </form>
+                      </div>
+                    </td> 
+                  </tr>
+              )))
             )}
           </tbody>
         </table>

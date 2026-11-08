@@ -5,7 +5,7 @@ import { Button } from "../../ui/button";
 import { Plus, Minus, } from "lucide-react";
 import { cn, formatText } from "@/lib/utils";
 import { Variant, Product } from "@/generated/prisma/client";
-import { useCartStore } from "@/store/cart-store";
+import { useCartStore } from "@/stores/cart-store";
 import AddToCartButton from "@/components/product/add-to-cart-btn";
 import ProductFeature from "./product-feature";
 
@@ -22,6 +22,7 @@ const ProductInfo = ({
   selectedVariantIndex,
   onSelectVariant,
 }: ProductInfoProps) => {
+  
   const [openFeature, setOpenFeature] = useState<string | null>(null);
   const currentVariant = variants[selectedVariantIndex];
   const currentColor = currentVariant.color || "Default";

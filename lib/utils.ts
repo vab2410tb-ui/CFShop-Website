@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Product, Variant } from "@/generated/prisma/client";
 import { CartItem } from "@/types/cart";
+import slugify from "slugify"
 
 export type ProductBase = Pick<Product, "id" | "name" | "slug" | "price" | "mainImage"> & {
   variants: Variant[];
@@ -19,12 +20,21 @@ export const formatText = (text: string) => {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+export const generateSlug = (title: string) => {
+  return slugify(title, {
+    lower: true,
+    strict: true,
+    locale: "vi",
+  });
+}
+
 export const getProductDefaultConfig = (product:ProductBase) => {
   const defaultVariant = product.variants?.find((v) => 
     v.images && product.mainImage ? v.images.includes(product.mainImage) : false
   ) || product.variants?.[0];
 
   const displayImage = defaultVariant?.images?.[1] || product.mainImage || null;
+  
   const cartItemPayload: CartItem = {
     id: product.id,
     name: product.name,

@@ -7,7 +7,7 @@ interface VariantImageProps {
 const VariantImage = ({selectedVariant}: VariantImageProps) => {
     return(
         <div>
-            {selectedVariant.images.length >= 4 && (
+           
                 <div className="flex gap-6 overflow-x-auto justify-between lg:grid lg:grid-cols-2">
                     {selectedVariant.images.map((imageUrl, index) => (
                         <div
@@ -17,17 +17,17 @@ const VariantImage = ({selectedVariant}: VariantImageProps) => {
                         <Image
                             src={imageUrl}
                             alt={`${selectedVariant.color} ${index + 1}`}
-                            height={330}
                             width={330}
+                            height={330}
                             className="h-full w-full object-contain"
                             priority={index === 0} 
                         />
                         </div>
                     ))}
                 </div>
-            )}
-            {selectedVariant.images.length < 4 && (
-                <div className="flex flex-col gap-6">
+         
+            {/* {selectedVariant.images.length < 4 && (
+                <div className="flex justify-center">
                     {selectedVariant.images.map((imageUrl, index) => (
                         <div
                             key={`${selectedVariant.color}-${index}`}
@@ -44,7 +44,7 @@ const VariantImage = ({selectedVariant}: VariantImageProps) => {
                         </div>
                     ))}
                 </div>
-            )}
+            )} */}
         </div>
         
     )

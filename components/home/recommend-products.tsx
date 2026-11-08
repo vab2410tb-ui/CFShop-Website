@@ -13,6 +13,12 @@ const RecommendedProducts = async () => {
             .toLocaleLowerCase()
             .replace(/\b\w/g, (char) => char.toUpperCase());
     };
+    console.log(
+  products.map((product) => ({
+    id: product.id,
+    name: product.name,
+  }))
+);
   return (
     <div className="px-[20px] md:px-[max(20px,calc(50%-700px))] pb-[64px]">
         <h2 className="text-2xl lg:text-[40px] font-bold pb-[40px]">Recommended Products</h2>

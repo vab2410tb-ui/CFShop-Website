@@ -13,14 +13,16 @@ import { HamberButton } from "./hamber-button";
 import { useQuery } from "@tanstack/react-query";
 import { searchProducts } from "@/lib/api/product";
 import { useDebounce } from "@/hooks/useDebounce";
-
+import { usePathname } from 'next/navigation';
 
 const Navigation = () => {
     const navLinkClass="relative inline-block after:absolute after:left-0 after:bottom-[1px] after:h-[1px] after:w-full after:bg-current after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100";
-    
+   
+    const pathname = usePathname();
     const [keyword, setKeyword] = useState("");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [drawer, setDrawer] = useState<"search" | "cart" | null>(null);
+   
     const debouncedKeyword = useDebounce(keyword, 300);
 
     const openSearch = () => setDrawer("search");
@@ -48,6 +50,10 @@ const Navigation = () => {
     
     const showProducts = keyword.trim() ? products : [];
 
+    if (pathname.startsWith("/checkout")) {
+        return null;
+    }    
+
     return(
         <>
             <header className="fixed z-10 w-full bg-white/50 backdrop-blur-xl shadow-lg h-[90px] py-[24px] px-[max(48px,calc(50%-700px))]">
@@ -64,16 +70,17 @@ const Navigation = () => {
                         <HamberButton mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen}/>
                     </div>
 
-                    <div className="hidden lg:flex w-[60px] h-12 items-center">     
+                    <div className="hidden lg:flex w-[70px] h-12 items-center">     
                         <div className="hidden lg:block">
                             <HamberButton mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen}/>
                         </div>
+
                         <Link href="/">
                             <Image
-                                src="/images/image.png"
+                                src="/images/logo.png"
                                 alt="Logo"
-                                width={70}
-                                height={50}
+                                width={80}
+                                height={60}
                                 className="h-full w-full object-contain"
                                 priority
                             />
@@ -105,15 +112,14 @@ const Navigation = () => {
                             </li>
                             <li><Link href="/warranty" className={navLinkClass}>Warranty</Link></li>
                             <li><Link href="/contact" className={navLinkClass}>Contact</Link></li>
-                            <li><Link href="/news" className={navLinkClass}>News</Link></li>
-                            <li><Link href="/" className={navLinkClass}>Display</Link></li>
+                            <li><Link href="/blog" className={navLinkClass}>Blogs</Link></li>
                         </ul>
                     </nav>
 
                     <div className="block lg:hidden w-[60px]">
                         <Link href="/">
                             <Image
-                                src="/images/image.png"
+                                src="/images/logo.png"
                                 alt="Logo"
                                 width={70}
                                 height={50}

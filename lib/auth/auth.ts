@@ -1,17 +1,18 @@
 import { auth } from "@/auth";
+import { getUserById } from "@/data/user";
 
 export const currentUser = async () => {
-    const session = await auth();
+  const session = await auth();
 
-    return(
-        session?.user
-    )
-}
+  if (!session?.user?.id) {
+    return null;
+  }
+
+  return getUserById(session.user.id);
+};
 
 export const currentRole = async () => {
-    const session = await auth();
+  const session = await auth();
 
-    return(
-        session?.user?.role
-    )
-}
+  return session?.user?.role;
+};
