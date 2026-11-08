@@ -27,7 +27,7 @@ const BlogDetailPage = async({params}:BlogDetailPageProps) => {
             </h1>
 
             <p className="text-center">
-              {new Date(blog.createdAt).toLocaleDateString("en-US")}
+              {new Date(blog.createdAt).toLocaleDateString("vi-VN")}
             </p>
           </div>
 

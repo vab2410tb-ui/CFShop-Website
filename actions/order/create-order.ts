@@ -1,6 +1,7 @@
 "use server";
 
 import { Resend } from "resend";
+import { getAppUrl } from "@/lib/config/app-url";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/auth/auth";
 import { CreateOrderSchema } from "@/schemas/order.schema";
@@ -271,7 +272,7 @@ const generateEmailTemplate = (
         Thank you for shopping with us!
       </h2>
       <div style="margin:40px 0;text-align:center">
-        <img src="https://your-domain.com/images/linea-mini-new-color-all-desktop.png" alt="Linea Mini" width="480" style="display:block;width:100%;max-width:480px;height:auto;object-fit:contain">
+        <img src="${getAppUrl()}/images/linea-mini-new-color-all-desktop.png" alt="Linea Mini" width="480" style="display:block;width:100%;max-width:480px;height:auto;object-fit:contain">
       </div>
       <p style="margin:8px 0;font-size:16px;line-height:1.6">
         Nothing makes us happier than seeing you support NAB Coffee not just once, your trust means so much to us and inspires us to keep doing what we love.

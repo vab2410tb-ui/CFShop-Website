@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { config, createMac } from "@/lib/services/zalopay";
+import { getAppUrl } from "@/lib/config/app-url";
 import { format } from "date-fns";
 import {
   ZaloPayOrderPayload,
@@ -76,24 +77,21 @@ export async function POST(req: Request) {
     }
 
     // 6. Determine the redirect URL
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ??
-      "https://8mcghb79-3000.asse.devtunnels.ms";
-
-    if (!baseUrl) {
+    let appUrl: string;
+    try {
+      appUrl = getAppUrl();
+    } catch {
       console.error(
-        "NEXT_PUBLIC_APP_URL is not configured",
+        "APP_URL is not configured",
       );
 
       return NextResponse.json(
         {
-          error: "NEXT_PUBLIC_APP_URL is not configured",
+          error: "APP_URL is not configured",
         },
         { status: 500 },
       );
     }
-
-    const appUrl = baseUrl.replace(/\/$/, "");
 
     const callbackUrl =
       `${appUrl}/api/payment/zalopay/callback`;
