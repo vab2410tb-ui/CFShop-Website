@@ -3,6 +3,7 @@
 import { uploadImageToCloudinary } from "@/lib/upload/upload-image-cloudinary";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { Suspense } from "react";
 import { Variant, Product, ProductSchema } from "@/schemas/product.schema";
 import { saveProduct, getProductById } from "@/actions/product";
 import { Button } from "@/components/ui/button";
@@ -354,4 +355,10 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default function AddProductPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading product form...</div>}>
+      <AddProduct />
+    </Suspense>
+  );
+}
