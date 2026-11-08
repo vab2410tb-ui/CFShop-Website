@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { Category, Prisma, Product, Variant } from '@/generated/prisma/client';
+import { Category, Prisma, Product, Variant } from '@prisma/client';
 
 interface GetProductsParams {
   category?: string;

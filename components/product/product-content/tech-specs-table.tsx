@@ -1,5 +1,5 @@
 import { formatText } from "@/lib/utils";
-import { TechSpecs } from "@/generated/prisma/client";
+import { TechSpecs } from "@prisma/client";
 
 interface TechSpecsTableProps {
   techSpecs: TechSpecs; 

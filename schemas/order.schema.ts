@@ -1,6 +1,6 @@
 
 import * as z from "zod";
-import { PaymentMethod } from "@/generated/prisma/enums";
+import { PaymentMethod } from "@prisma/client";
 
 export const OrderSchema = z.object({
   fullName: z

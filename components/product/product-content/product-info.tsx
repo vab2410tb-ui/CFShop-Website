@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "../../ui/button";
 import { Plus, Minus, } from "lucide-react";
 import { cn, formatText } from "@/lib/utils";
-import { Variant, Product } from "@/generated/prisma/client";
+import { Variant, Product } from "@prisma/client";
 import { useCartStore } from "@/stores/cart-store";
 import AddToCartButton from "@/components/product/add-to-cart-btn";
 import ProductFeature from "./product-feature";

@@ -1,4 +1,4 @@
-import { Product } from "@/generated/prisma/client";
+import { Product } from "@prisma/client";
 import { CollapsibleSection } from "@/components/ui/collapsible-section"; 
 import { Installation, PickUpTime, TechSpecsTable, Policy } from "@/components/product/product-content/tech-specs-table"; 
 

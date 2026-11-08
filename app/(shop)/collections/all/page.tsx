@@ -1,7 +1,7 @@
 import Image from "next/image";
 import CardProduct from "@/components/product/product-list";
 import CategoryProduct from "@/components/product/product-category";
-import { Category } from "@/generated/prisma/client";
+import { Category } from "@prisma/client";
 import { SlidersHorizontal } from 'lucide-react';
 import FilterProduct from "@/components/product/product-filter";
 

@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Variant } from "@/generated/prisma/client";
+import { Variant } from "@prisma/client";
 
 interface VariantImageProps {
   selectedVariant: Variant;

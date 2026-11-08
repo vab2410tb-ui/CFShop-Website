@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createOrder } from "@/actions/order/create-order";
 import { useCheckoutStore } from "@/stores/checkout-store";
-import { PaymentMethod as PrismaPaymentMethod } from "@/generated/prisma/enums";
+import { PaymentMethod as PrismaPaymentMethod } from "@prisma/client";
 import {
   useCartStore,
   useTotalPrice,

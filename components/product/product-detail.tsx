@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Product } from "@/generated/prisma/client";
+import { Product } from "@prisma/client";
 import VariantImage from "./product-content/product-image";
 import ProductInfo from "@/components/product/product-content/product-info";
 import ProductDescription from "./product-content/product-description";

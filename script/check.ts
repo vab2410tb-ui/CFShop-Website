@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import {
   PaymentStatus,
-} from "@/generated/prisma/enums";
+} from "@prisma/client";
 
 interface OrderItem {
   productId: string;

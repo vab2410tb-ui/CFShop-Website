@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { categories } from "@/constants/product-data"
-import { Category } from "@/generated/prisma/enums";
+import { Category } from "@prisma/client";
 
 
 interface Props {

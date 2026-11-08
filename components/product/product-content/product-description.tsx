@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation";
-import { TextContent } from "@/generated/prisma/client";
+import { TextContent } from "@prisma/client";
 import Image from "next/image";
 
 interface Props {

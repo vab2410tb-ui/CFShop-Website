@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Product, Variant } from "@/generated/prisma/client";
+import { Product, Variant } from "@prisma/client";
 import { CartItem } from "@/types/cart";
 import slugify from "slugify"
 

@@ -4,7 +4,7 @@ import { Edit, Trash2, Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { deleteProduct } from "@/actions/product"; // Import Server Action
 import SearchFilters from "@/app/admin/_components/search-filter";
-import { Category } from "@/generated/prisma/enums";
+import { Category } from "@prisma/client";
 
 
 interface SearchParams {

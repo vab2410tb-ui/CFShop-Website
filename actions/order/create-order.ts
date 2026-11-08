@@ -8,7 +8,7 @@ import {
   PaymentMethod,
   OrderStatus,
   PaymentStatus,
-} from "@/generated/prisma/enums";
+} from "@prisma/client";
 
 interface CartItemInput {
   productId: string;
