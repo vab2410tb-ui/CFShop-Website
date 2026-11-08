@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createOrder } from "@/actions/order/create-order";
 import { useCheckoutStore } from "@/stores/checkout-store";
-import { PaymentMethod as PrismaPaymentMethod } from "@prisma/client";
 import {
   useCartStore,
   useTotalPrice,
@@ -21,12 +20,12 @@ interface PaymentResponse {
   error?: string;
 }
 
-const paymentMethodMap: Record<string, PrismaPaymentMethod> = {
-    cod: PrismaPaymentMethod.COD,
-    bank: PrismaPaymentMethod.BANK,
-    zalopay: PrismaPaymentMethod.ZALOPAY,
-    vnpay: PrismaPaymentMethod.VNPAY,
-};
+const paymentMethodMap = {
+    cod: "COD",
+    bank: "BANK",
+    zalopay: "ZALOPAY",
+    vnpay: "VNPAY",
+} as const;
 
 const CheckoutPage = () => {
   const router = useRouter();
