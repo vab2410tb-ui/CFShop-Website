@@ -46,6 +46,7 @@ export const useCheckoutStore = create<CheckoutStore>() (
             clearCheckout:() => 
                 set({
                     checkoutInfo: null,
+                    paymentMethod: "cod",
                 }),
             }),
             

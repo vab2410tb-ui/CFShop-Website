@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ChevronRight, LayoutDashboard, Package, ShoppingCart, User, Newspaper } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { logout } from "@/actions/auth/logout";
+import { useCheckoutStore } from "@/stores/checkout-store";
 import {
   Sidebar,
   SidebarHeader,
@@ -30,9 +31,11 @@ import {
 export function AppSidebar() {
     const { isMobile, toggleSidebar, openMobile } = useSidebar()
     const pathname = usePathname();
+    const clearCheckout = useCheckoutStore((state) => state.clearCheckout);
     
-    const onClick = () => {
-        logout();
+    const onClick = async () => {
+        clearCheckout();
+        await logout();
     }
     
     return (

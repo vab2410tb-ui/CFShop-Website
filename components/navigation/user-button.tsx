@@ -1,5 +1,6 @@
 import { User, UserCircle, LogOut } from 'lucide-react';
 import { useSession, signOut } from "next-auth/react";
+import { useCheckoutStore } from "@/stores/checkout-store";
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -12,6 +13,7 @@ import {
 
 const UserButton = () => {
     const { data: session } = useSession();
+    const clearCheckout = useCheckoutStore((state) => state.clearCheckout);
 
     return (
       <DropdownMenu modal={false}>
@@ -50,7 +52,10 @@ const UserButton = () => {
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={async () => {
+                  clearCheckout();
+                  await signOut({ callbackUrl: "/" });
+                }}
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
