@@ -65,7 +65,6 @@ const OrderForm = ({ initialData }: OrderFormProps) => {
   });
 
   const onSubmit: SubmitHandler<OrderValues> = (data) => {
-    console.log("Dữ liệu form trước khi gửi:", data);
     setError("");
     setSuccess("");
 

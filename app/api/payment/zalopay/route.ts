@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { config, createMac } from "@/lib/services/zalopay";
 import { getAppUrl } from "@/lib/config/app-url";
+import { format } from "date-fns";
 import {
   ZaloPayOrderPayload,
   ZaloPayCreateResponse,
@@ -97,7 +98,6 @@ export async function POST(req: Request) {
 
     // 7. Embed payment data
     const embed_data = {
-      preferred_payment_method: [],
       redirecturl:
         `${appUrl}/checkout/success?orderId=${encodeURIComponent(
           orderId,
@@ -114,15 +114,10 @@ export async function POST(req: Request) {
       .toString()
       .slice(-4);
 
-    // ZaloPay requires the transaction ID date prefix to use Vietnam time
-    // (GMT+7); Vercel's server timezone is typically UTC.
-    const vietnamDatePrefix = new Date(Date.now() + 7 * 60 * 60 * 1000)
-      .toISOString()
-      .slice(2, 10)
-      .replaceAll("-", "");
+    const items: Record<string, unknown>[] = [{}];
 
     const app_trans_id =
-      `${vietnamDatePrefix}_${cleanOrderId}${uniqueSuffix}`;
+      `${format(new Date(), "yyMMdd")}_${cleanOrderId}${uniqueSuffix}`;
 
     // 9. Create the ZaloPay order payload
     const order: ZaloPayOrderPayload = {
@@ -131,9 +126,7 @@ export async function POST(req: Request) {
       app_user: "nab_coffee_user",
       app_time: Date.now(),
       expire_duration_seconds: 1800,
-      // ZaloPay expects a valid JSON array string; use [] when no line items
-      // are being passed to the gateway.
-      item: JSON.stringify([]),
+      item: JSON.stringify(items),
       embed_data: JSON.stringify(embed_data),
       amount,
       description:
