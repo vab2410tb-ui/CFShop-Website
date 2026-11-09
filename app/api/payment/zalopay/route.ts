@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { config, createMac } from "@/lib/services/zalopay";
 import { getAppUrl } from "@/lib/config/app-url";
-import { format } from "date-fns";
 import {
   ZaloPayOrderPayload,
   ZaloPayCreateResponse,
@@ -115,8 +114,15 @@ export async function POST(req: Request) {
       .toString()
       .slice(-4);
 
+    // ZaloPay requires the transaction ID date prefix to use Vietnam time
+    // (GMT+7); Vercel's server timezone is typically UTC.
+    const vietnamDatePrefix = new Date(Date.now() + 7 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(2, 10)
+      .replaceAll("-", "");
+
     const app_trans_id =
-      `${format(new Date(), "yyMMdd")}_${cleanOrderId}${uniqueSuffix}`;
+      `${vietnamDatePrefix}_${cleanOrderId}${uniqueSuffix}`;
 
     // 9. Create the ZaloPay order payload
     const order: ZaloPayOrderPayload = {
