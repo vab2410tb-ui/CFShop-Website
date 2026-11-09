@@ -98,6 +98,7 @@ export async function POST(req: Request) {
 
     // 7. Embed payment data
     const embed_data = {
+      preferred_payment_method: [],
       redirecturl:
         `${appUrl}/checkout/success?orderId=${encodeURIComponent(
           orderId,
@@ -117,8 +118,6 @@ export async function POST(req: Request) {
     const app_trans_id =
       `${format(new Date(), "yyMMdd")}_${cleanOrderId}${uniqueSuffix}`;
 
-    const items: Record<string, unknown>[] = [{}];
-
     // 9. Create the ZaloPay order payload
     const order: ZaloPayOrderPayload = {
       app_id: Number(config.app_id),
@@ -126,7 +125,9 @@ export async function POST(req: Request) {
       app_user: "nab_coffee_user",
       app_time: Date.now(),
       expire_duration_seconds: 1800,
-      item: JSON.stringify(items),
+      // ZaloPay expects a valid JSON array string; use [] when no line items
+      // are being passed to the gateway.
+      item: JSON.stringify([]),
       embed_data: JSON.stringify(embed_data),
       amount,
       description:

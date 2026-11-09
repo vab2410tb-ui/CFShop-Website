@@ -207,26 +207,32 @@ export const createOrder = async (data: CreateOrderActionInput) => {
       return newOrder;
     });
 
-    // Send confirmation email after the transaction is committed.
-    try {
-      await sendTransactionalEmail({
-        to: shippingInfo.email,
-        subject: `[${orderData.orderId}] Thank you for your order!`,
-        html: generateEmailTemplate(
-          {
-            orderId: orderData.orderId,
-            paymentMethod: orderData.paymentMethod,
-            totalPrice: orderData.totalPrice,
-          },
-          shippingInfo,
-        ),
-      });
-    } catch (emailError) {
-      // Email failure should not make the order fail.
-      console.error(
-        "Failed to send order confirmation email:",
-        emailError,
-      );
+    // Send an order confirmation immediately for offline payment methods.
+    // Online payment orders are confirmed by the payment callback instead.
+    if (
+      paymentMethod === PaymentMethod.COD ||
+      paymentMethod === PaymentMethod.BANK
+    ) {
+      try {
+        await sendTransactionalEmail({
+          to: shippingInfo.email,
+          subject: `[${orderData.orderId}] Thank you for your order!`,
+          html: generateEmailTemplate(
+            {
+              orderId: orderData.orderId,
+              paymentMethod: orderData.paymentMethod,
+              totalPrice: orderData.totalPrice,
+            },
+            shippingInfo,
+          ),
+        });
+      } catch (emailError) {
+        // Email failure should not make the order fail.
+        console.error(
+          "Failed to send order confirmation email:",
+          emailError,
+        );
+      }
     }
 
     return {

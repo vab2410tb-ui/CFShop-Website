@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { config } from "@/lib/services/zalopay";
+import { sendTransactionalEmail } from "@/lib/services/mail";
 
 interface ZaloPayCallbackRequest {
   data: string;
@@ -325,6 +326,47 @@ export async function POST(req: Request) {
         status: "PROCESSING",
       },
     });
+
+    // Notify the customer only after ZaloPay has confirmed payment.
+    // Email delivery failure must not make ZaloPay retry a paid callback.
+    try {
+      const escapeHtml = (value: string) =>
+        value.replace(/[&<>"']/g, (character) => {
+          const entities: Record<string, string> = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          };
+          return entities[character];
+        });
+      const shippingInfo = order.shippingInfo;
+      const itemsHtml = order.orderItems
+        .map(
+          (item) =>
+            `<li>${escapeHtml(item.name)} × ${item.quantity} — ${item.price.toLocaleString("vi-VN")} ₫</li>`,
+        )
+        .join("");
+
+      await sendTransactionalEmail({
+        to: shippingInfo.email,
+        subject: `[${order.orderId}] ZaloPay payment confirmed`,
+        html: `
+          <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#222">
+            <h2>Payment confirmed</h2>
+            <p>Thank you, ${escapeHtml(shippingInfo.fullName)}. We have received your ZaloPay payment.</p>
+            <p><strong>Order ID:</strong> ${escapeHtml(order.orderId)}</p>
+            <p><strong>Total paid:</strong> ${order.totalPrice.toLocaleString("vi-VN")} ₫</p>
+            <h3>Items</h3>
+            <ul>${itemsHtml}</ul>
+            <p>We will contact you about delivery shortly.</p>
+          </div>
+        `,
+      });
+    } catch (emailError) {
+      console.error("Failed to send ZaloPay payment confirmation email:", emailError);
+    }
 
     console.log(
       `ZaloPay payment successful: ${orderId}`
